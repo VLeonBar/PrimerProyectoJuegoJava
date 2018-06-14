@@ -268,6 +268,7 @@ public class Juego extends JDialog implements ActionListener {
             Juego.this.getContentPane().setFocusable(true);
             hazVisible2(false);
             tmrMovimiento.start();
+            flagPausa=true;
         }
         if (ae.getSource() == btnSalir) {
             int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea salir al menú principal?", "Salir", JOptionPane.YES_NO_OPTION);
