@@ -7,6 +7,7 @@ package main;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 /**
@@ -17,7 +18,7 @@ public class Auxiliar extends JDialog {
 
     private JLabel lblToDo,lblWorking;
 
-    public Auxiliar(Inicio ventanaInicio) {
+    public Auxiliar(JFrame ventanaInicio) {
         super(ventanaInicio, true);
         ImageIcon imgWorking=new ImageIcon(Auxiliar.class.getResource("/main/imagenes/workinprogress.png"));
         lblWorking = new JLabel(imgWorking);

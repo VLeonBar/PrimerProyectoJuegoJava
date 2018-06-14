@@ -23,9 +23,9 @@ public class Juego extends JDialog implements ActionListener {
     private JMenu mnuJuego, mnuOpciones;
     private JMenuItem mnuRecord, mnuNuevo, mnuControles, mnuSalir, mnuAyuda, mnuBorrar;
 //    private JPanel pnlPausa;
-    private boolean flagMovimiento, flagColision = true;
-    private JLabel lblAvion, lblBarrera, lblBarrera2, lblSuelo, lblCielo, lblContador, lblFinal, lblContinue;
-    private JButton btnSi, btnNo, btnContinuar, btnOpciones, btnSalir;
+    private boolean flagMovimiento, flagColision = true, flagPausa = true;
+    private JLabel lblAvion, lblBarrera, lblBarrera2, lblSuelo, lblCielo, lblContador, lblFinal, lblContinue, lblPausa;
+    private JButton btnSi, btnNo, btnContinuar, btnSalir;
     private ArrayList<JLabel> alBarreras, alBarreras2;
     private Timer tmrMovimiento;
     private int bolaY = 400, cont = 0, randSizeY, randLocY, record = 0;
@@ -43,6 +43,7 @@ public class Juego extends JDialog implements ActionListener {
         ImageIcon imgBaja = new ImageIcon(Juego.class.getResource("/main/imagenes/avionbaja.png"));
         ImageIcon imgExplosion = new ImageIcon(Juego.class.getResource("/main/imagenes/explosion.png"));
         ImageIcon imgFinal = new ImageIcon(Juego.class.getResource("/main/imagenes/gameover.png"));
+        ImageIcon imgPausa = new ImageIcon(Juego.class.getResource("/main/imagenes/gris.png"));
         creaRecord(record);
         alBarreras = new ArrayList();
         alBarreras2 = new ArrayList();
@@ -58,7 +59,6 @@ public class Juego extends JDialog implements ActionListener {
         mnuSalir = new JMenuItem("Salir");
         mnuSalir.setMnemonic('S');
         mnuSalir.addActionListener(this);
-        
 
         mnuJuego = new JMenu("Juego");
         mnuJuego.setMnemonic('J');
@@ -72,20 +72,15 @@ public class Juego extends JDialog implements ActionListener {
         mnuControles.setMnemonic('C');
         mnuControles.addActionListener(this);
 
-        mnuAyuda = new JMenuItem("Ayuda");
-        mnuAyuda.setMnemonic('A');
-        mnuAyuda.addActionListener(this);
-
         mnuBorrar = new JMenuItem("Borrar Récord");
         mnuBorrar.setMnemonic('B');
         mnuBorrar.addActionListener(this);
         mnuOpciones = new JMenu("Opciones");
-        
+
         mnuOpciones.setMnemonic('O');
         mnuOpciones.add(mnuControles);
-        mnuOpciones.add(mnuBorrar);
         mnuOpciones.addSeparator();
-        mnuOpciones.add(mnuAyuda);
+        mnuOpciones.add(mnuBorrar);
 
         //MENU PRINCIPAL
         mnuBarra = new JMenuBar();
@@ -143,24 +138,24 @@ public class Juego extends JDialog implements ActionListener {
         btnContinuar = new JButton("Continuar");
         btnContinuar.setSize(100, 40);
         btnContinuar.setFocusable(true);
-        btnContinuar.setLocation(350, 250);
+        btnContinuar.setLocation(350, 270);
         btnContinuar.setVisible(false);
         btnContinuar.addActionListener(this);
         this.add(btnContinuar);
-        //BOTON OPCIONES
-        btnOpciones = new JButton("Opciones");
-        btnOpciones.setSize(100, 40);
-        btnOpciones.setLocation(350, 300);
-        btnOpciones.setVisible(false);
-        btnOpciones.addActionListener(this);
-        this.add(btnOpciones);
         //BOTON SALIR
         btnSalir = new JButton("Salir");
         btnSalir.setSize(100, 40);
-        btnSalir.setLocation(350, 350);
+        btnSalir.setLocation(350, 320);
         btnSalir.setVisible(false);
         btnSalir.addActionListener(this);
         this.add(btnSalir);
+        //FONDO PAUSA (DESHABILITADO POR FALTA DE FONDO TRANSPARENTE)
+        lblPausa = new JLabel(imgPausa);
+        lblPausa.setSize(800, 800);
+        lblPausa.setLocation(0, 0);
+        lblPausa.setVisible(false);
+        lblPausa.setFocusable(false);
+        this.add(lblPausa);
         //SUELO
         lblSuelo = new JLabel(imgSuelo);
         lblSuelo.setSize(900, 400);
@@ -236,7 +231,7 @@ public class Juego extends JDialog implements ActionListener {
 
             public void creaBarrera() {
                 randSizeY = (int) (Math.random() * 480 + 1);
-                randLocY = randSizeY + 225;
+                randLocY = randSizeY + 210;
 
                 lblBarrera = new JLabel(imgBarrera);
                 lblBarrera.setSize(50, randSizeY);
@@ -260,6 +255,81 @@ public class Juego extends JDialog implements ActionListener {
         this.getContentPane().addMouseListener(new MouseHelper());
     }
 
+
+    @Override
+    public void actionPerformed(ActionEvent ae) {
+        if (ae.getSource() == btnSi) {
+            juegoNuevo();
+        }
+        if (ae.getSource() == btnNo) {
+            this.dispose();
+        }
+        if (ae.getSource() == btnContinuar) {
+            Juego.this.getContentPane().setFocusable(true);
+            hazVisible2(false);
+            tmrMovimiento.start();
+        }
+        if (ae.getSource() == btnSalir) {
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea salir al menú principal?", "Salir", JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                Juego.this.dispose();
+            }
+            if (respuesta == JOptionPane.NO_OPTION) {
+            }
+        }
+        //Botones Menú
+        if (ae.getSource() == mnuNuevo) {
+            juegoNuevo();
+        }
+        if (ae.getSource() == mnuRecord) {
+            tmrMovimiento.stop();
+            Inicio i = (Inicio) this.getOwner();
+            i.leeRecord();
+        }
+        if (ae.getSource() == mnuBorrar) {
+            tmrMovimiento.stop();
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿Seguro que quiere borrar el récord?", "Borrar récord", JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                borraRecord();
+            }
+            if (respuesta == JOptionPane.NO_OPTION) {
+            }
+        }
+        if (ae.getSource() == mnuControles) {
+            tmrMovimiento.stop();
+            //ESTO NO IBA A SER ASÍ,PERO ESTÁ EN PROCESO DE MEJORA.
+            JOptionPane.showMessageDialog(null, "Pulsar/Soltar > Barra espaciadora o Botón izquierdo del ratón > Ascender/Descender.\nPulsar > ESC o \"P\" para pausar el juego. ");
+        }
+        if (ae.getSource() == mnuSalir) {
+            tmrMovimiento.stop();
+            int respuesta = JOptionPane.showConfirmDialog(null, "¿Desea salir al menú principal?", "Salir", JOptionPane.YES_NO_OPTION);
+            if (respuesta == JOptionPane.YES_OPTION) {
+                Juego.this.dispose();
+            }
+            if (respuesta == JOptionPane.NO_OPTION) {
+            }
+        }
+    }
+
+    public void juegoNuevo() {
+        tmrMovimiento.stop();
+        for (JLabel barrera : alBarreras) {
+            barrera.setVisible(false);
+        }
+        for (JLabel barrera : alBarreras2) {
+            barrera.setVisible(false);
+        }
+        alBarreras.clear();
+        alBarreras2.clear();
+        hazVisible(false);
+        hazVisible2(false);
+        record = 0;
+        lblContador.setText("Puntuación : " + Integer.toString(record));
+        lblContador.setLocation(350, 50);
+        flagColision = true;
+        tmrMovimiento.start();
+    }
+
     public void hazVisible(boolean flag) {
         lblFinal.setVisible(flag);
         btnSi.setVisible(flag);
@@ -267,66 +337,11 @@ public class Juego extends JDialog implements ActionListener {
         lblContinue.setVisible(flag);
         btnSi.setSelected(flag);
     }
-
-    @Override
-    public void actionPerformed(ActionEvent ae) {
-        if (ae.getSource() == btnSi) {
-            for (JLabel barrera : alBarreras) {
-                barrera.setVisible(false);
-            }
-            for (JLabel barrera : alBarreras2) {
-                barrera.setVisible(false);
-            }
-            alBarreras.clear();
-            alBarreras2.clear();
-            hazVisible(false);
-            record = 0;
-            lblContador.setText("Puntuación : " + Integer.toString(record));
-            lblContador.setLocation(350, 50);
-            flagColision = true;
-            tmrMovimiento.start();
-        }
-        if (ae.getSource() == btnNo) {
-            this.dispose();
-        }
-        if (ae.getSource() == btnContinuar) {
-            setVisible2(false);
-            tmrMovimiento.start();
-        }
-        if (ae.getSource() == btnOpciones) {
-            System.err.println("HOLAAAAAAAAA");
-        }
-        if (ae.getSource() == btnSalir) {
-            int respuesta=JOptionPane.showConfirmDialog(null, "¿Desea salir al menú principal?","Salir",JOptionPane.YES_NO_OPTION);
-            if (respuesta == JOptionPane.YES_OPTION) {
-                Juego.this.dispose();
-            }
-            if (respuesta == JOptionPane.NO_OPTION){}
-        }
-        //Botones Menú
-        if (ae.getSource() == mnuNuevo) {
-            
-        }
-        if (ae.getSource() == mnuRecord) {
-        }
-        if (ae.getSource() == mnuBorrar) {
-            borraRecord();
-        }
-        if (ae.getSource() == mnuAyuda) {
-            
-        }
-        if (ae.getSource() == mnuControles) {
-            
-        }
-        if (ae.getSource() == mnuSalir) {
-            
-        }
-    }
-
-    public void setVisible2(boolean flag) {
+    
+    public void hazVisible2(boolean flag) {
         btnContinuar.setVisible(flag);
-        btnOpciones.setVisible(flag);
         btnSalir.setVisible(flag);
+        lblPausa.setVisible(flag);
     }
 
     public void creaRecord(int newrecord) {
@@ -362,6 +377,9 @@ public class Juego extends JDialog implements ActionListener {
 
         @Override
         public void mousePressed(MouseEvent e) {
+            if (flagColision && (flagPausa == true)) {
+                tmrMovimiento.start();
+            }
             flagMovimiento = true;
         }
 
@@ -379,9 +397,12 @@ public class Juego extends JDialog implements ActionListener {
                 flagMovimiento = true;
             }
             if ((e.getKeyCode() == KeyEvent.VK_ESCAPE) || (e.getKeyCode() == KeyEvent.VK_P)) {
-                tmrMovimiento.stop();
-                setVisible2(true);
-                Juego.this.repaint();
+                if (flagColision) {
+                    flagPausa = false;
+                    tmrMovimiento.stop();
+                    hazVisible2(true);
+                    Juego.this.repaint();
+                }
             }
         }
 

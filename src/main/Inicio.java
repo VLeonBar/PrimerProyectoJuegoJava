@@ -84,12 +84,8 @@ public class Inicio extends JFrame implements ActionListener {
             leeRecord();
         }
         if (e.getSource() == btnControl) {
-            Auxiliar aux = new Auxiliar(this);
-            aux.setSize(220, 120);
-            aux.setResizable(false);
-            aux.setLocationRelativeTo(null);
-            aux.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            aux.setVisible(true);
+            //ESTO NO IBA A SER ASÍ,PERO ESTÁ EN PROCESO DE MEJORA.
+            JOptionPane.showMessageDialog(null, "Pulsar/Soltar > Barra espaciadora o Botón izquierdo del ratón > Ascender/Descender.\nPulsar > ESC o \"P\" para pausar el juego. ");
 
         }
         if (e.getSource() == btnSalir) {
